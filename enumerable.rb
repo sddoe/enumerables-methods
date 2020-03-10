@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 module Enumerable
   def my_each
     return to_enum unless block_given?
@@ -224,14 +222,14 @@ puts arr.each.class == arr.my_each.class
 
 puts
 
-puts (arr.my_each_with_index { |n, index| puts "Index is #{index} and element is #{n}" })
+puts(arr.my_each_with_index { |n, index| puts "Index is #{index} and element is #{n}" })
 puts(hash.my_each_with_index { |n, index| puts "Index is: #{index} and element is: #{n}" })
 puts arr.each_with_index.class == arr.my_each_with_index.class
 
 puts
 
 puts arr.my_select(&:odd?)
-puts(hash.my_select {|_key, value| value == 2 })
+puts(hash.my_select { |_key, value| value == 2 })
 
 puts
 
@@ -262,7 +260,7 @@ puts(hash.my_count { |_key, value| value.odd? })
 
 puts
 
-print(arr.my_map { |n| n*2 })
+print(arr.my_map { |n| n * 2 })
 puts
 print(hash.my_map { |key, value| [key, value] })
 

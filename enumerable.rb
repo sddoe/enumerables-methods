@@ -122,9 +122,9 @@ module Enumerable
         break unless bool
       end
     else
-      my_each do |key, value| 
-        bool = false if yield(key, value) 
-        break unless bool 
+      my_each do |key, value|
+        bool = false if yield(key, value)
+        break unless bool
       end
     end
 
@@ -138,7 +138,7 @@ module Enumerable
       if self.class == Array
         my_each { |n| counter += 1 if yield(n) }
       else
-        my_each { |key,value| counter += 1 if yield(key, value) }
+        my_each { |key, value| counter += 1 if yield(key, value) }
       end
     elsif !block_given? && parameter.nil?
       return length
@@ -154,7 +154,7 @@ module Enumerable
 
     arr = []
     if self.class == Array
-      my_each {|n| arr << yield(n)}
+      my_each { |n| arr << yield(n) }
     else
       my_each { |key, value| arr << yield(key, value) }
     end
@@ -215,66 +215,66 @@ module Enumerable
 end
 
 arr = [1, 2, 3, 4, 5]
-hash = {a: 1, b: 2, c: 3}
-arr_words = %w(door bottle chair cat)
+hash = { a: 1, b: 2, c: 3 }
+arr_words = %w[door bottle chair cat]
 
-puts arr.my_each {|n| print n}
-puts hash.my_each {|key, value| puts "Key: #{key}, Value: #{value}"}
+puts(arr.my_each { |n| print n })
+puts(hash.my_each { |key, value| puts "Key: #{key}, Value: #{value}" })
 puts arr.each.class == arr.my_each.class
 
 puts
 
-puts arr.my_each_with_index {|n,index| puts "Index is #{index} and element is #{n}"}
-puts hash.my_each_with_index {|n, index| puts "Index is: #{index} and element is: #{n}"}
+puts (arr.my_each_with_index { |n, index| puts "Index is #{index} and element is #{n}" })
+puts(hash.my_each_with_index { |n, index| puts "Index is: #{index} and element is: #{n}" })
 puts arr.each_with_index.class == arr.my_each_with_index.class
 
 puts
 
 puts arr.my_select(&:odd?)
-puts hash.my_select {|key,value| value == 2}
+puts(hash.my_select {|_key, value| value == 2 })
 
 puts
 
-puts arr_words.my_all? {|word| word.length >= 3}
-puts arr_words.my_all? {|word| word.length >= 4}
+puts(arr_words.my_all? { |word| word.length >= 3 })
+puts(arr_words.my_all? { |word| word.length >= 4 })
 puts arr_words.my_all?(/c/)
 puts arr.my_all?(Numeric)
 
 puts
 
-puts arr_words.my_any? {|word| word.length >= 3}
-puts arr_words.my_any? {|word| word.length >= 4}
+puts(arr_words.my_any? { |word| word.length >= 3 })
+puts(arr_words.my_any? { |word| word.length >= 4 })
 puts arr_words.my_any?(/s/)
 puts arr.my_any?(Integer)
 
 puts
 
-puts arr_words.my_none? {|word| word.length == 3}
-puts arr_words.my_none? {|word| word.length >= 6}
+puts(arr_words.my_none? { |word| word.length == 3 })
+puts(arr_words.my_none? { |word| word.length >= 6 })
 puts arr_words.my_none?(/f/)
 puts arr.my_none?(Float)
 
 puts
 
 puts arr.my_count(1)
-puts arr.my_count {|n| n > 2}
-puts hash.my_count {|key,value| value.odd?}
+puts(arr.my_count { |n| n > 2 })
+puts(hash.my_count { |_key, value| value.odd? })
 
 puts
 
-print arr.my_map {|n| n*2}
+print(arr.my_map { |n| n*2 })
 puts
-print hash.my_map {|key,value| [key,value]}
+print(hash.my_map { |key, value| [key, value] })
 
 puts
 puts
 
-puts arr.my_inject {|sum, n| sum + n}
-puts arr.my_inject(1) {|pro, n| pro * n}
-longest = arr_words.my_inject {|counter,word| counter.length > word.length ? counter : word}
+puts(arr.my_inject { |sum, n| sum + n })
+puts arr.my_inject(1) { |pro, n| pro * n }
+longest = arr_words.my_inject { |counter, word| counter.length > word.length ? counter : word }
 puts longest
 
-puts 
+puts
 
 def multiply_els(arr)
   arr.my_inject do |counter, n|
@@ -286,6 +286,6 @@ puts multiply_els(arr).to_s
 
 puts
 
-test_proc = proc {|n| n + 5}
+test_proc = proc { |n| n + 5 }
 
 puts arr.my_map(&test_proc).to_s

@@ -6,7 +6,7 @@ module Enumerable
 
     i = 0
     test_class = self.class
-    arr = if test_class == Array 
+    arr = if test_class == Array
             self
           elsif test_class == Range
             to_a
@@ -16,7 +16,7 @@ module Enumerable
 
     while i < arr.length
       if test_class == Hash
-        yield(arr[i], arr[i+1])
+        yield(arr[i], arr[i + 1])
         i += 2
       else
         yield(arr[i])
@@ -24,7 +24,7 @@ module Enumerable
       end
     end
   end
-  
+
   def my_each_with_index
     return to_enum unless block_given?
 
@@ -40,12 +40,12 @@ module Enumerable
   def my_select
     return to_enum unless block_given?
 
-    arr = self.class == Array ? []:{}
+    arr = self.class == Array ? [] : {}
 
     if arr.class == Array
-      my_each {|n| arr.push(n) if yield(n)}
+      my_each { |n| arr.push(n) if yield(n) }
     else
-      my_each {|key,value| arr[key] = value if yield(key,value)}
+      my_each { |key, value| arr[key] = value if yield(key, value) }
     end
 
     arr
@@ -58,7 +58,7 @@ module Enumerable
 
     bool = true
     if self.class == Array
-      my_each {|n|
+      my_each do |n|
         if block_given?
           bool = false unless yield(n)
         elsif parameter.class == Regexp
@@ -69,9 +69,9 @@ module Enumerable
           bool = false unless n.class <= parameter
         end
         break unless bool
-      }
+      end
     else
-      my_each {|key,value| bool = false unless yield(key,value)}
+      my_each { |key, value| bool = false unless yield(key, value) }
     end
 
     bool
@@ -84,19 +84,19 @@ module Enumerable
 
     bool = false
     if self.class == Array
-      my_each {|n|
+      my_each do |n|
         if block_given?
           bool = true if yield(n)
         elsif parameter.class == Regexp
           bool = true if n.match(parameter)
         elsif parameter.class <= String
           bool = true if n == parameter
-        else
-          bool = true if n.class <= parameter
+        elsif n.class <= parameter
+          bool = true
         end
-      }
+      end
     else
-      my_each {|key,value| bool = true if yield(key,value)}
+      my_each { |key, value| bool = true if yield(key, value) }
     end
 
     bool
@@ -109,23 +109,20 @@ module Enumerable
 
     bool = true
     if self.class == Array
-      my_each {|n|
+      my_each do |n|
         if block_given?
           bool = false if yield(n)
         elsif parameter.class == Regexp
           bool = false if n.match(parameter)
         elsif parameter.class <= Numeric
           bool = false if n == parameter
-        else
-          bool = false if n.class <= parameter
+        elsif n.class <= parameter
+          bool = false
         end
         break unless bool
-      }
+      end
     else
-      my_each {|key,value| 
-        bool = false if yield(key,value)
-        break unless bool
-      }
+      my_each { |key, value| bool = false if yield(key, value) break unless bool }
     end
 
     bool
@@ -136,14 +133,14 @@ module Enumerable
 
     if block_given?
       if self.class == Array
-        my_each {|n| counter += 1 if yield(n)}
+        my_each { |n| counter += 1 if yield(n) }
       else
-        my_each {|key,value| counter += 1 if yield(key,value)}
+        my_each { |key,value| counter += 1 if yield(key, value) }
       end
     elsif !block_given? && parameter.nil?
       return length
     elsif !block_given? && !parameter.nil?
-      my_each {|n| counter += 1 if n == parameter}
+      my_each { |n| counter += 1 if n == parameter }
     end
 
     counter
@@ -156,7 +153,7 @@ module Enumerable
     if self.class == Array
       my_each {|n| arr << yield(n)}
     else
-      my_each {|key,value| arr << yield(key,value)}
+      my_each { |key, value| arr << yield(key, value) }
     end
 
     arr
@@ -175,39 +172,39 @@ module Enumerable
     case symbol
     when :+
       if !provided
-        drop(1).my_each {|n| counter += n}
+        drop(1).my_each { |n| counter += n }
       else
-        my_each {|n| counter += n}
+        my_each { |n| counter += n }
       end
     when :*
       if !provided
-        drop(1).my_each {|n| counter *= n}
+        drop(1).my_each { |n| counter *= n }
       else
-        my_each {|n| counter *= n}
+        my_each { |n| counter *= n }
       end
     when :/
       if !provided
-        drop(1).my_each {|n| counter /= n}
+        drop(1).my_each { |n| counter /= n }
       else
-        my_each {|n| counter /= n}
+        my_each { |n| counter /= n }
       end
     when :-
       if !provided
-        drop(1).my_each {|n| counter -= n}
+        drop(1).my_each { |n| counter -= n }
       else
-        my_each {|n| counter -= n}
+        my_each { |n| counter -= n }
       end
     when :**
       if !provided
-        drop(1).my_each {|n| counter **= n}
+        drop(1).my_each { |n| counter **= n }
       else
-        my_each {|n| counter **= n}
+        my_each { |n| counter **= n }
       end
     else
       if !provided
-        drop(1).my_each {|n| counter = yield(counter,n)}
+        drop(1).my_each { |n| counter = yield(counter, n) }
       else
-        my_each {|n| counter = yield(counter,n)}
+        my_each { |n| counter = yield(counter, n) }
       end
     end
     counter

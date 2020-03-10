@@ -77,10 +77,58 @@ module Enumerable
     bool
   end
 
-  def my_any?
+  def my_any?(parameter = nil)
+    return false if (self.class == Array && count.zero?) || (!block_given? && parameter.nil? && !include?(true))
+
+    return true unless block_given? || !parameter.nil?
+
+    bool = false
+    if self.class == Array
+      my_each {|n|
+        if block_given?
+          bool = true if yield(n)
+        elsif parameter.class == Regexp
+          bool = true if n.match(parameter)
+        elsif parameter.class <= String
+          bool = true if n == parameter
+        else
+          bool = true if n.class <= parameter
+        end
+      }
+    else
+      my_each {|key,value| bool = true if yield(key,value)}
+    end
+
+    bool
   end
 
-  def my_none?
+  def my_none?(parameter = nil)
+    return true if (self.class == Array && count.zero?) || (self[0].nil? && !include?(true))
+
+    return false unless block_given? || !parameter.nil?
+
+    bool = true
+    if self.class == Array
+      my_each {|n|
+        if block_given?
+          bool = false if yield(n)
+        elsif parameter.class == Regexp
+          bool = false if n.match(parameter)
+        elsif parameter.class <= Numeric
+          bool = false if n == parameter
+        else
+          bool = false if n.class <= parameter
+        end
+        break unless bool
+      }
+    else
+      my_each {|key,value| 
+        bool = false if yield(key,value)
+        break unless bool
+      }
+    end
+
+    bool
   end
 
   def my_count
@@ -119,7 +167,19 @@ puts
 
 puts arr_words.my_all? {|word| word.length >= 3}
 puts arr_words.my_all? {|word| word.length >= 4}
-puts arr_words.my_all?(/t/)
+puts arr_words.my_all?(/c/)
 puts arr.my_all?(Numeric)
 
 puts
+
+puts arr_words.my_any? {|word| word.length >= 3}
+puts arr_words.my_any? {|word| word.length >= 4}
+puts arr_words.my_any?(/s/)
+puts arr.my_any?(Integer)
+
+puts
+
+puts arr_words.my_none? {|word| word.length == 3}
+puts arr_words.my_none? {|word| word.length >= 6}
+puts arr_words.my_none?(/f/)
+puts arr.my_none?(Float)

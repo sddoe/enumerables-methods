@@ -131,16 +131,86 @@ module Enumerable
     bool
   end
 
-  def my_count
+  def my_count(parameter = nil)
+    counter = 0
+
+    if block_given?
+      if self.class == Array
+        my_each {|n| counter += 1 if yield(n)}
+      else
+        my_each {|key,value| counter += 1 if yield(key,value)}
+      end
+    elsif !block_given? && parameter.nil?
+      return length
+    elsif !block_given? && !parameter.nil?
+      my_each {|n| counter += 1 if n == parameter}
+    end
+
+    counter
   end
 
   def my_map
+    return to_enum unless block_given?
+
+    arr = []
+    if self.class == Array
+      my_each {|n| arr << yield(n)}
+    else
+      my_each {|key,value| arr << yield(key,value)}
+    end
+
+    arr
   end
 
-  def my_inject
-  end
+  def my_inject(symbol = nil, initial = nil)
+    if symbol.class != Symbol
+      temp = symbol
+      symbol = initial
+      initial = temp
+    end
 
-  def multiply_els
+    provided = false
+    provided = true unless initial.nil?
+    counter = initial || first
+    case symbol
+    when :+
+      if !provided
+        drop(1).my_each {|n| counter += n}
+      else
+        my_each {|n| counter += n}
+      end
+    when :*
+      if !provided
+        drop(1).my_each {|n| counter *= n}
+      else
+        my_each {|n| counter *= n}
+      end
+    when :/
+      if !provided
+        drop(1).my_each {|n| counter /= n}
+      else
+        my_each {|n| counter /= n}
+      end
+    when :-
+      if !provided
+        drop(1).my_each {|n| counter -= n}
+      else
+        my_each {|n| counter -= n}
+      end
+    when :**
+      if !provided
+        drop(1).my_each {|n| counter **= n}
+      else
+        my_each {|n| counter **= n}
+      end
+    else
+      if !provided
+        drop(1).my_each {|n| counter = yield(counter,n)}
+      else
+        my_each {|n| counter = yield(counter,n)}
+      end
+    end
+    counter
   end
 end
 
@@ -183,3 +253,39 @@ puts arr_words.my_none? {|word| word.length == 3}
 puts arr_words.my_none? {|word| word.length >= 6}
 puts arr_words.my_none?(/f/)
 puts arr.my_none?(Float)
+
+puts
+
+puts arr.my_count(1)
+puts arr.my_count {|n| n > 2}
+puts hash.my_count {|key,value| value.odd?}
+
+puts
+
+print arr.my_map {|n| n*2}
+puts
+print hash.my_map {|key,value| [key,value]}
+
+puts
+puts
+
+puts arr.my_inject {|sum, n| sum + n}
+puts arr.my_inject(1) {|pro, n| pro * n}
+longest = arr_words.my_inject {|counter,word| counter.length > word.length ? counter : word}
+puts longest
+
+puts 
+
+def multiply_els(arr)
+  arr.my_inject do |counter, n|
+    counter * n
+  end
+end
+
+puts multiply_els(arr).to_s
+
+puts
+
+test_proc = proc {|n| n + 5}
+
+puts arr.my_map(&test_proc).to_s

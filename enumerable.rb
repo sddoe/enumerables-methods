@@ -122,7 +122,10 @@ module Enumerable
         break unless bool
       end
     else
-      my_each { |key, value| bool = false if yield(key, value) break unless bool }
+      my_each do |key, value| 
+        bool = false if yield(key, value) 
+        break unless bool 
+      end
     end
 
     bool

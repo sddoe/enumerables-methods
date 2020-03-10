@@ -3,17 +3,16 @@ module Enumerable
     return to_enum unless block_given?
 
     i = 0
-    test_class = self.class
-    arr = if test_class == Array
-            self
-          elsif test_class == Range
-            to_a
-          else
-            flatten
-          end
+    if self.class == Array
+      arr = self
+    elsif self.class == Range
+      arr = to_a
+    else
+      arr = flatten
+    end
 
     while i < arr.length
-      if test_class == Hash
+      if self.class == Hash
         yield(arr[i], arr[i + 1])
         i += 2
       else

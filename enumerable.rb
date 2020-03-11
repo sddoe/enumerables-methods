@@ -1,26 +1,12 @@
-# rubocop:disable Style/CaseEquality
-
 module Enumerable
   def my_each
     return to_enum unless block_given?
 
     i = 0
-    arr = if self.class == Array
-            self
-          elsif self.class == Range
-            to_a
-          else
-            flatten
-          end
-
+    arr = self.class == Array ? self : to_a
     while i < arr.length
-      if self.class == Hash
-        yield(arr[i], arr[i + 1])
-        i += 2
-      else
-        yield(arr[i])
-        i += 1
-      end
+      yield(arr[i])
+      i += 1
     end
   end
 
@@ -29,8 +15,7 @@ module Enumerable
 
     i = 0
     arr = self.class == Array ? self : to_a
-
-    while i < length
+    while i < arr.length
       yield(arr[i], i)
       i += 1
     end
@@ -39,15 +24,10 @@ module Enumerable
   def my_select
     return to_enum unless block_given?
 
-    arr = self.class == Array ? [] : {}
-
-    if arr.class == Array
-      my_each { |n| arr.push(n) if yield(n) }
-    else
-      my_each { |key, value| arr[key] = value if yield(key, value) }
-    end
-
-    arr
+    resp = []
+    arr = self.class == Array ? self : to_a
+    arr.my_each { |n| resp.push(n) if yield(n) }
+    resp
   end
 
   def my_all?(parameter = nil)
@@ -72,13 +52,11 @@ module Enumerable
     else
       my_each { |key, value| bool = false unless yield(key, value) }
     end
-
     bool
   end
 
   def my_any?(parameter = nil)
     return false if (self.class == Array && count.zero?) || (!block_given? && parameter.nil? && !include?(true))
-
     return true unless block_given? || !parameter.nil?
 
     bool = false
@@ -97,13 +75,11 @@ module Enumerable
     else
       my_each { |key, value| bool = true if yield(key, value) }
     end
-
     bool
   end
 
   def my_none?(parameter = nil)
     return true if (self.class == Array && count.zero?) || (self[0].nil? && !include?(true))
-
     return false unless block_given? || !parameter.nil?
 
     bool = true
@@ -126,13 +102,11 @@ module Enumerable
         break unless bool
       end
     end
-
     bool
   end
 
   def my_count(parameter = nil)
     counter = 0
-
     if block_given?
       if self.class == Array
         my_each { |n| counter += 1 if yield(n) }
@@ -144,7 +118,6 @@ module Enumerable
     elsif !block_given? && !parameter.nil?
       my_each { |n| counter += 1 if n == parameter }
     end
-
     counter
   end
 
@@ -157,7 +130,6 @@ module Enumerable
     else
       my_each { |key, value| arr << yield(key, value) }
     end
-
     arr
   end
 
@@ -167,7 +139,6 @@ module Enumerable
       symbol = initial
       initial = temp
     end
-
     provided = false
     provided = true unless initial.nil?
     counter = initial || first
@@ -213,80 +184,19 @@ module Enumerable
   end
 end
 
-# rubocop:enable Style/CaseEquality
-
 arr = [1, 2, 3, 4, 5]
-hash = { a: 1, b: 2, c: 3 }
 arr_words = %w[door bottle chair cat]
 
 puts(arr.my_each { |n| print n })
-puts(hash.my_each { |key, value| puts "Key: #{key}, Value: #{value}" })
 puts arr.each.class == arr.my_each.class
 
 puts
 
 puts(arr.my_each_with_index { |n, index| puts "Index is #{index} and element is #{n}" })
-puts(hash.my_each_with_index { |n, index| puts "Index is: #{index} and element is: #{n}" })
 puts arr.each_with_index.class == arr.my_each_with_index.class
 
 puts
 
 puts arr.my_select(&:odd?)
-puts(hash.my_select { |_key, value| value == 2 })
 
 puts
-
-puts(arr_words.my_all? { |word| word.length >= 3 })
-puts(arr_words.my_all? { |word| word.length >= 4 })
-puts arr_words.my_all?(/c/)
-puts arr.my_all?(Numeric)
-
-puts
-
-puts(arr_words.my_any? { |word| word.length >= 3 })
-puts(arr_words.my_any? { |word| word.length >= 4 })
-puts arr_words.my_any?(/s/)
-puts arr.my_any?(Integer)
-
-puts
-
-puts(arr_words.my_none? { |word| word.length == 3 })
-puts(arr_words.my_none? { |word| word.length >= 6 })
-puts arr_words.my_none?(/f/)
-puts arr.my_none?(Float)
-
-puts
-
-puts arr.my_count(1)
-puts(arr.my_count { |n| n > 2 })
-puts(hash.my_count { |_key, value| value.odd? })
-
-puts
-
-print(arr.my_map { |n| n * 2 })
-puts
-print(hash.my_map { |key, value| [key, value] })
-
-puts
-puts
-
-puts(arr.my_inject { |sum, n| sum + n })
-puts arr.my_inject(1) { |pro, n| pro * n }
-longest = arr_words.my_inject { |counter, word| counter.length > word.length ? counter : word }
-puts longest
-
-puts
-
-def multiply_els(arr)
-  arr.my_inject do |counter, n|
-    counter * n
-  end
-end
-
-puts multiply_els(arr).to_s
-
-puts
-
-test_proc = proc { |n| n + 5 }
-
-puts arr.my_map(&test_proc).to_s

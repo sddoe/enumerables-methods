@@ -1,3 +1,5 @@
+# rubocop:disable Style/CaseEquality
+
 module Enumerable
   def my_each
     return to_enum unless block_given?
@@ -210,6 +212,8 @@ module Enumerable
     counter
   end
 end
+
+# rubocop:enable Style/CaseEquality
 
 arr = [1, 2, 3, 4, 5]
 hash = { a: 1, b: 2, c: 3 }

@@ -68,7 +68,7 @@ module Enumerable
     if block_given?
       my_each { |n| counter += 1 if block.call(n) }
     elsif parameter.nil?
-      my_each { |_n| counter += 1 if item }
+      my_each { |n| counter += 1 if n }
     else
       my_each { |n| counter += 1 if parameter === n } # rubocop:disable Style/CaseEquality
       to_enum
@@ -76,10 +76,15 @@ module Enumerable
     counter
   end
 
-  def my_map
+  def my_map(*block)
+    return to_enum(:my_map) unless block_given?
     arr = []
-    my_each { |n| arr << yield(n) if yield(n) != 0 } and return arr if block_given?
-    to_enum
+    if !block[0].nil?
+      size.times { |n| arr << (block[0].call to_a[n]) }
+    else
+      size.times { |n| arr << (yield to_a[n]) }
+    end
+    arr
   end
 
   def my_inject(counter = nil, oper = nil, &block)
@@ -137,6 +142,7 @@ puts
 
 puts arr.my_count(1)
 puts(arr.my_count { |n| n > 2 })
+puts [1, 2, 3].my_count
 
 puts
 
@@ -162,6 +168,7 @@ puts multiply_els(arr).to_s
 
 puts
 
-test_proc = proc { |n| n + 5 }
+test_proc = proc { |n| n > 5 }
 
 puts arr.my_map(&test_proc).to_s
+puts arr.my_map(&test_proc) { |n| n < 5 }.to_s

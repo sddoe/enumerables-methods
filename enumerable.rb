@@ -51,16 +51,7 @@ module Enumerable
   end
 
   def my_none?(parameter = nil, &block)
-    bool = true
-    if block
-      my_each { |n| bool = false if block.call(n) }
-    elsif parameter.nil?
-      my_each { |n| bool = false if n }
-    else
-      my_each { |n| bool = false if parameter === n } # rubocop:disable Style/CaseEquality
-      to_enum
-    end
-    bool
+    !my_any?(parameter, &block)
   end
 
   def my_count(parameter = nil, &block)
